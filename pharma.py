@@ -3,7 +3,7 @@ import pandas as pd
 import scipy.stats as st
 
 pd.set_option('display.max_columns', None)
-# pd.set_option('display.max_rows', None)
+
 csv1 = "data/Mouse_metadata.csv"
 csv2 = "data/Study_results.csv"
 df1 = pd.read_csv(csv1)
@@ -36,4 +36,26 @@ plot = x_axis.plot.bar(color='tab:red')
 plt.xlabel("Drug Type")
 plt.ylabel("Number of Timepoints")
 plt.title("Timepoints by Drug Type")
+plt.show()
+
+x_axis = x_axis.index.values
+y_axis = df.groupby(['Drug Regimen'])["Timepoint"].count()
+plt.bar(x_axis, y_axis, color='tab:red', alpha=1, align='center')
+plt.xlabel("Drug Type")
+plt.ylabel("Number of Timepoints")
+plt.xticks(rotation="vertical")
+plt.title("Timepoints by Drug Type")
+plt.show()
+
+sex = df["Sex"].value_counts()
+sex.plot.pie(autopct= "%1.1f%%")
+plt.title("Sex Distribution")
+plt.show()
+
+male = (round(sex[0]/(sex[0] + sex[1]) * 100))
+female = (round(sex[1]/(sex[0] + sex[1]) * 100))
+labels = ['Male', 'Female']
+sizes = [male, female]
+plot = sex.plot.pie(y='Total Count', autopct="%1.1f%%")
+plt.title("Sex Distribution")
 plt.show()
