@@ -59,3 +59,26 @@ sizes = [male, female]
 plot = sex.plot.pie(y='Total Count', autopct="%1.1f%%")
 plt.title("Sex Distribution")
 plt.show()
+
+df = pd.merge(df1, df2, how="left")
+df3 = df.groupby(["Mouse ID"])["Timepoint"].max()
+df3 = df3.reset_index()
+df3 = pd.merge(df, df3, on=['Mouse ID','Timepoint'], how="left")
+
+drug_search = ['Capomulin', 'Ramicane', 'Infubinol', 'Ceftamin']
+drugs = {'Capomulin': [], 'Ramicane': [], 'Infubinol': [], 'Ceftamin': []}
+for drug in drug_search:
+    for mouse in df3.index:
+        if df3.iloc[mouse]['Drug Regimen'] == drug:
+            drugs[drug].append(df3.iloc[mouse]['Tumor Volume (mm3)'])
+
+dft = pd.DataFrame.from_dict(drugs, orient='index')
+dft = dft.transpose()
+dfd = dft.describe()
+for drug in drug_search:
+    iqr = ((dfd.loc['75%'][drug]) - (dfd.loc['25%'][drug]))
+    lower_bound = (dfd.loc['25%'][drug] - (1.5 * iqr))
+    upper_bound = (dfd.loc['75%'][drug] + (1.5 * iqr))
+    print(f'{drug}: IQR: {iqr}, upper: {upper_bound}, lower: {lower_bound}')
+    outliers = dft.loc[(dft[drug] <= lower_bound) | (dft[drug] >= upper_bound)]
+    print(outliers)
